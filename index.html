@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Teresa Control</title>
+    <link rel="stylesheet" type="text/css" href="css/flightindicators.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js" integrity="sha512-STof4xm1wgkfm7heWqFJVn58Hm3EtS31XFaagaa8VMReCXAkQnJZ+jEy8PCC/iT18dFy95WcExNHFTqLyp72eQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="js/jquery.flightindicators.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js" integrity="sha512-334uBDwY0iZ2TklV1OtDtBW9vp7jjP7SWRzT7Ehu1fdtPIjTpCwTSFb8HI/YBau9L1/kRBEOALrS229Kry4yFQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="js/ext/TextGeometry.js"></script>
+    <script src="js/ext/FontLoader.js"></script>
+    <script>
+	    SERVO_MCU="192.168.1.222";
+	    GYRO_MCU="192.168.98.39";
+    </script>
+    <script src="js/3d.js"></script>
+    <script src="js/video.js"></script>
+    <script src="js/joystick-controller.js"></script>
+    <script src="js/gamepad.js"></script>
+    <script src="js/mygpad.js"></script>
+    <script src="js/ws.js"></script>
+    <link rel="shortcut icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAABILAAASCwAAAAAAAAAAAAB43s8AeN7PAHjezwB43s8AeN7PAHjezwAAAAD/AAAA/wAAAP8AAAD/eN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AAAAA/wAAAP8AAAD/AAAA/3jezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAAAAAP8AAAD/AAAA/wAAAP943s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwAAAAD/AAAA/wAAAP8AAAD/eN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AAAAA/wAAAP8AAAD/AAAA/3jezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAAAAAP8AAAD/AAAA/wAAAP943s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwAAAAD/AAAA/wAAAP8AAAD/eN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AAAAA/wAAAP8AAAD/AAAA/3jezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAAAAAP8AAAD/AAAA/wAAAP943s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwAAAAD/AAAA/wAAAP8AAAD/eN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AAAAA/wAAAP8AAAD/AAAA/3jezwB43s8AeN7PAHjezwB43s8AeN7PAAAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP943s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8AeN7PAHjezwB43s8A/D8AAPw/AAD8PwAA/D8AAPw/AAD8PwAA/D8AAPw/AAD8PwAA/D8AAPw/AAAAAAAAAAAAAAAAAAAAAAAA//8AAA==">
+  <style>
+    body { margin:0; padding:0; overflow: hidden; }
+    .joystick { background-color: red; background: radial-gradient(#ff0000,#b30000) !important; width: 55px !important; height: 55px !important; }
+    #tjoy { margin-left: -100px; left: 50%; margin-top: 3%; }
+    #joy { width: 200px; height: 200px; }
+    #stream { position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%; z-index: -100; }
+  </style>
+  <script>
+
+    $(document).ready(function(){
+
+	// GAMEPAD
+        const gamepad = new GamepadController(0);
+        gamepad.onStickMove(0, function(e){
+                        posX=Math.round(e.current.x*180);
+                        posY=Math.round(e.current.y*180);
+                        wsend(posX,posY);
+                        $('#X').text(posX);
+                        $('#Y').text(posY);
+        });
+
+        // Live Video
+        startWebRTC();
+
+        // 3D init
+        init();
+        animate();
+	speed=$.flightIndicator('#speed','airspeed', { size:200,showBox:true });
+
+        // Connect to websocket
+        setTimeout(() => { wsco(); }, 1000);
+
+        // Check webrtc status every 3s
+        setInterval(check_webrtc,3000);
+
+        // Gamepad events
+        window.addEventListener('gamepadconnected',pad);
+        window.addEventListener('mouseover',joy);
+        window.addEventListener('touchstart',joy);
+
+	// UI/UX stuff
+        $(document).mousedown(function(e) {
+			if(e.target.id!="hidectrl") {
+			    $("#tjoy").show();
+			    $("#container").fadeIn();
+			    $("#hidectrl").fadeIn();
+			} else { $("#hidectrl").show(); }
+		  });
+	$("#hidectrl").click(function() {
+		  	setTimeout(() => { $("#container").fadeOut(); }, 500);
+		  	setTimeout(() => { $("#tjoy").fadeOut(); }, 1000);
+			$("#hidectrl").hide();
+		  });
+        $(document).on({'touchstart':function(e) {
+			if(e.target.id!="hidectrl") {
+			    $("#container").fadeIn();
+			    $("#tjoy").fadeIn();
+			} else {
+			    $("#hidectrl").show();
+                            setTimeout(() => { $("#container").fadeOut(); }, 500);
+                            setTimeout(() => { $("#tjoy").fadeOut(); }, 1000);
+                  	}
+		  } });
+
+	$("#container").hide();
+	$("#tjoy").hide();
+
+    });
+
+  </script>
+</head>
+<body>
+  <img src="img/hide.svg" id="hidectrl" style="height: 30px; width: 38px; filter: invert(100%); display: none; opacity: 0.3; position: absolute; left: 15px; top: 15px; z-index: 100;" alt="">
+  <video autoplay muted playsinline id="stream"></video>
+  <div style="width: 100%; display: flex; position: fixed; top: 0;">
+    <div id="tjoy" class="instrument" style="height: 200px; width: 200px;">
+      <div id="joy" style="margin: auto;"></div>
+      <img src="img/fi_box.svg" class="background box" style="z-index: -1;" alt="">
+    </div>
+  </div>
+
+  <!-- ugly debug -->
+  <div id="X"></div>
+  <div id="Xws"></div>
+  <div id="Y"></div>
+  <div id="Yws"></div>
+  <!-- ugly debug -->
+
+  <div id="container" style="width: 100%; display: flex; position: absolute; bottom: 0;">
+      <span id="heading" style="float: left;"></span>
+      <span id="attitude" style="margin: 0 auto;"></span>
+      <span id="speed" style="margin: 0 auto;"></span>
+      <div class="instrument" style="margin: 0 auto;">
+            <div id="3dwheels" style="height: 175px; width: 175px; margin: 12.5px auto;"></div>
+            <img src="img/fi_box.svg" class="background box" style="z-index: -1;" alt="">
+      </div>
+      <div class="instrument" style="float: right;">
+            <div id="3dcar" style="height: 175px; width: 175px; margin: 12.5px auto;"></div>
+            <img src="img/fi_box.svg" class="background box" style="z-index: -1;" alt="">
+      </div>
+  </div>
+</body>
+</html>
