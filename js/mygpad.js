@@ -7,12 +7,18 @@ var x=0;
 var y=0;
 var speed;
 
-function throttle_send(x,y,limit){
-	diff=Date.now()-start;
-	if (diff>limit) {
-		ctrl_socket.send(JSON.stringify({"cmd":"pos","X":x,"Y":y}));
-		start=Date.now();
-	} 
+function throttle_send(x,y,limit,limitX,limitY){
+	// IF Y<limitY... the motor won't run, so we send zero instead
+	if(Math.abs(y)<limitY) y=0;
+	// Realtime when we approach the small values... not otherwise
+	if(Math.abs(x)<limitX || Math.abs(y)<limitY) ctrl_socket.send(JSON.stringify({"cmd":"pos","X":x,"Y":y}));
+	else {
+		diff=Date.now()-start;
+		if (diff>limit) {
+			ctrl_socket.send(JSON.stringify({"cmd":"pos","X":x,"Y":y}));
+			start=Date.now();
+		} 
+	}
 }
 
 function padwsco() {
@@ -44,7 +50,7 @@ function wsend(x,y) {
 	mesh3.rotation.z = (Math.PI/2) + (x/4*(Math.PI/180));
 
 	if(ctrl_socket==undefined) padwsco();
-	if(ctrl_socket.readyState===1) { throttle_send(x,y,75); }
+	if(ctrl_socket.readyState===1) { throttle_send(x,y,75,5,30); }
 	else {
 		// TIMEOUT LET'S TRY TO RECONNECT
 		count++;

@@ -10,7 +10,7 @@
     <script src="js/ext/TextGeometry.js"></script>
     <script src="js/ext/FontLoader.js"></script>
     <script>
-	    SERVO_MCU="192.168.1.222";
+	    SERVO_MCU="192.168.98.8";
 	    GYRO_MCU="192.168.98.39";
     </script>
     <script src="js/3d.js"></script>
@@ -68,6 +68,7 @@
 			    $("#hidectrl").fadeIn();
 			} else { $("#hidectrl").show(); }
 		  });
+	$(document).mouseup(function(e) { wsend(0,0); });
 	$("#hidectrl").click(function() {
 		  	setTimeout(() => { $("#container").fadeOut(); }, 500);
 		  	setTimeout(() => { $("#tjoy").fadeOut(); }, 1000);
